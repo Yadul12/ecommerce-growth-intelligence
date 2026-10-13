@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecommerce_growth_pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_growth}
+      POSTGRES_USER: ${POSTGRES_USER:-analyst}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-analyst_dev_pass}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pg_ecommerce_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d/sql_scripts:ro
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "work_mem=32MB"
+      - "-c"
+      - "maintenance_work_mem=128MB"
+      - "-c"
+      - "random_page_cost=1.1"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-analyst} -d $${POSTGRES_DB:-ecommerce_growth}"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  pg_ecommerce_data:
