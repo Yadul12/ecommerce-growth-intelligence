@@ -1,0 +1,19 @@
+{
+  "name": "E-commerce Growth Intelligence",
+  "image": "mcr.microsoft.com/devcontainers/python:3",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && cp -n .env.example .env",
+  "postStartCommand": "docker compose up -d",
+  "forwardPorts": [8501, 5433],
+  "portsAttributes": {
+    "8501": { "label": "Streamlit dashboard", "onAutoForward": "openBrowser" },
+    "5433": { "label": "PostgreSQL", "onAutoForward": "silent" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-ossdata.vscode-pgsql"]
+    }
+  }
+}
