@@ -13,6 +13,9 @@ CREATE INDEX IF NOT EXISTS idx_events_ts_covering
 CREATE INDEX IF NOT EXISTS idx_sessions_user_start_ts
     ON sessions (user_id, session_start_ts);
 
+CREATE INDEX IF NOT EXISTS idx_sessions_start_ts
+    ON sessions (session_start_ts);
+
 CREATE INDEX IF NOT EXISTS idx_sessions_segment_cover
     ON sessions (device_type, city_tier, acquisition_channel)
     INCLUDE (session_id, primary_category);

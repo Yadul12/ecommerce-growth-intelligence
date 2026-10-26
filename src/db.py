@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -27,8 +28,15 @@ def get_db_url() -> str:
     return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
 
 
+@lru_cache(maxsize=1)
 def get_engine() -> Engine:
-    return create_engine(get_db_url(), pool_pre_ping=True)
+    return create_engine(
+        get_db_url(),
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
+        pool_recycle=1800,
+    )
 
 
 def get_raw_connection():
