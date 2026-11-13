@@ -13,10 +13,11 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SQL_DIR = PROJECT_ROOT / "sql"
+PYTHON_ROOT = Path(__file__).resolve().parent.parent  # python/
+REPO_ROOT = PYTHON_ROOT.parent  # repository root (shared sql/ and .env)
+SQL_DIR = REPO_ROOT / "sql"
 
-load_dotenv(PROJECT_ROOT / ".env")
+load_dotenv(REPO_ROOT / ".env")
 
 
 def get_db_url() -> str:
