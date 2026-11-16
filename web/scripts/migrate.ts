@@ -15,8 +15,14 @@ import { Client } from "pg";
 import dotenv from "dotenv";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, "..");
-dotenv.config({ path: path.join(ROOT, ".env") });
+const WEB_ROOT = path.resolve(__dirname, "..");
+const REPO_ROOT = path.resolve(WEB_ROOT, "..");
+const SQL_DIR = fs.existsSync(path.join(WEB_ROOT, "sql"))
+  ? path.join(WEB_ROOT, "sql")
+  : path.join(REPO_ROOT, "sql");
+
+dotenv.config({ path: path.join(WEB_ROOT, ".env") });
+dotenv.config({ path: path.join(REPO_ROOT, ".env") });
 
 function resolveDbUrl(): string {
   const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
@@ -53,7 +59,7 @@ async function main() {
 
   const client = new Client({
     connectionString,
-    ssl: isLocal || /sslmode=/.test(connectionString) ? false : { rejectUnauthorized: true },
+    ...(isLocal || /sslmode=/.test(connectionString) ? {} : { ssl: { rejectUnauthorized: true } }),
   });
 
   await client.connect();
@@ -62,12 +68,12 @@ async function main() {
   if (!isVerifyOnly) {
     if (isReset) {
       console.log("[1/3] Applying relational schema (sql/00_schema.sql)...");
-      const schemaSql = fs.readFileSync(path.join(ROOT, "sql", "00_schema.sql"), "utf-8");
+      const schemaSql = fs.readFileSync(path.join(SQL_DIR, "00_schema.sql"), "utf-8");
       await client.query(schemaSql);
       console.log("      ✓ Schema and tables created.\n");
 
       console.log("[2/3] Generating deterministic synthetic dataset (sql/seed_data.sql, SEED=42)...");
-      const seedSql = fs.readFileSync(path.join(ROOT, "sql", "seed_data.sql"), "utf-8");
+      const seedSql = fs.readFileSync(path.join(SQL_DIR, "seed_data.sql"), "utf-8");
       const t0 = Date.now();
       await client.query(seedSql);
       console.log(`      ✓ Seed data generated in ${((Date.now() - t0) / 1000).toFixed(2)}s.\n`);
@@ -76,7 +82,7 @@ async function main() {
     }
 
     console.log("[3/3] Building composite & covering indexes (sql/10_indexes_and_explain_analyze.sql)...");
-    const indexSql = fs.readFileSync(path.join(ROOT, "sql", "10_indexes_and_explain_analyze.sql"), "utf-8");
+    const indexSql = fs.readFileSync(path.join(SQL_DIR, "10_indexes_and_explain_analyze.sql"), "utf-8");
     await client.query(indexSql);
     console.log("      ✓ Indexes and table statistics updated.\n");
   }

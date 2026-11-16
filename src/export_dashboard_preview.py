@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 
 from src.db import run_sql_file_df, query_df
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # repository root
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = PROJECT_ROOT / "docs"
 SCREENSHOTS_DIR = DOCS_DIR / "screenshots"
 

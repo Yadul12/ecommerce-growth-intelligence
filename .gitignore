@@ -17,12 +17,11 @@ Thumbs.db
 .idea/
 
 # Node / Next.js
-/node_modules
-/.next/
-/out/
-/coverage
-.vercel
+node_modules/
+.next/
+out/
+coverage/
+.vercel/
 *.tsbuildinfo
 next-env.d.ts
 npm-debug.log*
-
